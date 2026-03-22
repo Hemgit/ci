@@ -77,6 +77,18 @@ stage('Quality Gate') {
                 }
             }
         }
+
+
+    stage('artifact upload') {
+     steps{
+      sh 'mvn deploy'
+     }
+      post{
+     success {
+       mail bcc: '', body: 'nexus upload success', cc: '', from: '', replyTo: '', subject: 'artifact uploaded', to: '5hemanthunplugged@gmail.com'
+     }
+      }
+    }
     
   }
   }
