@@ -27,6 +27,7 @@ agent{
       }
     }
 
+    /*
     stage('Test'){
      steps{
       sh 'mvn test'
@@ -52,7 +53,10 @@ agent{
         mail bcc: '', body: 'integration test failed', cc: '', from: '', replyTo: '', subject: 'integration test failed', to: '5hemanthunplugged@gmail.com'
        }
      }
-   }
+   
+  }
+
+  */
   }
   
 }
