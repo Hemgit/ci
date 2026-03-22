@@ -68,7 +68,9 @@ agent{
     // some block
 }
       
-         
+     timeout(time: 10, unit: 'MINUTES') {
+               waitForQualityGate abortPipeline: true
+            }  
        }
 
        post{
@@ -82,24 +84,7 @@ agent{
 
     }
 
-    stage('qualitygate')
-    {
-     steps{
-      timeout(time: 10, unit: 'MINUTES') {
-
-        script {
-    def qg = waitForQualityGate()
-    echo "Quality Gate status: ${qg.status}"
-            if (qg.status != 'OK') {
-                    error "Pipeline aborted because Quality Gate failed: ${qg.status}"
-}
-        }
-    
-}
-     }
-    }
-    
-    
+ 
 
   }
   }
