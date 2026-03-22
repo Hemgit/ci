@@ -68,6 +68,7 @@ agent{
       withSonarQubeEnv('sonar') {
         sh 'mvn sonar:sonar -Dsonar.projectKey=Maven-Java-Project'
     // some block
+        waitForQualityGate abortPipeline: true
 }
       
     
@@ -85,25 +86,7 @@ agent{
     }
     
 
-stage("Quality Gate") {
-    steps {
-        script {
-            echo "=== Starting Quality Gate check ==="
-            timeout(time: 5, unit: 'MINUTES') {
-                echo "Calling waitForQualityGate()..."
-                def qg = waitForQualityGate()
-                echo "Quality Gate returned: ${qg.status}"
-                
-                if (qg.status != 'OK') {
-                    error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
-                } else {
-                    echo "Quality Gate PASSED ✅"
-                }
-            }
-            echo "=== Finished Quality Gate stage ==="
-        }
-    }
-}
+
   }
   }
 
