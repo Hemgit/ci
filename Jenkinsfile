@@ -86,7 +86,7 @@ stage('Quality Gate') {
                         if (qg.status != 'OK') {
                             error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
                         }
-              # waitForQualityGate abortPipeline: false
+              // waitForQualityGate abortPipeline: false
                 }
             }
         }
