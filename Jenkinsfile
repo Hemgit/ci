@@ -58,35 +58,41 @@ agent{
 
     
 
-    stage('sonaranalysis')
-    {
-       tools{
-      jdk 'jdk17'
-       }
-     steps{
-      
-      withSonarQubeEnv('sonar') {
-        sh 'mvn sonar:sonar -Dsonar.projectKey=Maven-Java-Project'
-    // some block
-        waitForQualityGate abortPipeline: true
-}
-      
-    
-       }
-
-       post{
-      success {
-       sh 'echo sonar success'
-      }
-        failure{
-            mail bcc: '', body: 'sonar code analysis failed', cc: '', from: '', replyTo: '', subject: 'sonar code analysis  failed', to: '5hemanthunplugged@gmail.com'
-        }
-     }
-
+   stage('SonarQube Analysis') {
+    tools {
+        jdk 'jdk17'
     }
-    
-
-
+    steps {
+        withSonarQubeEnv('sonar') {
+            sh 'mvn sonar:sonar -Dsonar.projectKey=Maven-Java-Project'
+            
+            // Wait for quality gate
+            script {
+                timeout(time: 10, unit: 'MINUTES') {
+                    def qg = waitForQualityGate()
+                    echo "Quality Gate status: ${qg.status}"
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Sonar analysis completed successfully'
+        }
+        failure {
+            mail bcc: '', 
+                 body: 'Sonar code analysis failed', 
+                 cc: '', 
+                 from: '', 
+                 replyTo: '', 
+                 subject: 'Sonar code analysis failed', 
+                 to: '5hemanthunplugged@gmail.com'
+        }
+    }
+}
   }
   }
 
