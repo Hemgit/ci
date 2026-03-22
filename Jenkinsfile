@@ -90,6 +90,7 @@ stage('Quality Gate') {
                 }
             }
         }
+}
 
 
     stage('artifact upload') {
