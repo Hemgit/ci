@@ -56,7 +56,7 @@ agent{
    
   }
 
-    /*
+    
 
     stage('sonaranalysis')
     {
@@ -83,17 +83,24 @@ agent{
      }
 
     }
-    */
+    
 
- stage("Quality Gate") {
+stage("Quality Gate") {
     steps {
-        timeout(time: 10, unit: 'MINUTES') {
-            script {
+        script {
+            echo "=== Starting Quality Gate check ==="
+            timeout(time: 5, unit: 'MINUTES') {
+                echo "Calling waitForQualityGate()..."
                 def qg = waitForQualityGate()
+                echo "Quality Gate returned: ${qg.status}"
+                
                 if (qg.status != 'OK') {
-                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
+                } else {
+                    echo "Quality Gate PASSED ✅"
                 }
             }
+            echo "=== Finished Quality Gate stage ==="
         }
     }
 }
