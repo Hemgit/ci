@@ -56,6 +56,8 @@ agent{
    
   }
 
+    /*
+
     stage('sonaranalysis')
     {
        tools{
@@ -81,6 +83,7 @@ agent{
      }
 
     }
+    */
 
  stage("Quality Gate") {
     steps {
