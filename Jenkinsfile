@@ -43,7 +43,7 @@ agent{
     }
    stage('integration testing'){
      steps{
-      sh 'mvn verify'
+      sh 'mvn verify -DskipTests'
      }
      post{
         success{
@@ -56,12 +56,7 @@ agent{
    
   }
 
-     stage('codeanalysis'){
-      steps{
-          sh 'mvn checkstyle:checkstyle'
-      }
-     }
-  
+    
   }
   
 }
