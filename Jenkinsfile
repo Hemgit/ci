@@ -56,6 +56,11 @@ agent{
    
   }
 
+     stage('codeanalysis'){
+      steps{
+          sh 'mvn checkstyle:checkstyle'
+      }
+     }
   
   }
   
