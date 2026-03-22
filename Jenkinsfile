@@ -3,7 +3,7 @@ agent{
   label 'buildserver'
 }
   tools{
-    jdk 'jdk17'
+    jdk 'jdk8'
     maven 'm3'
   }
   stages{
