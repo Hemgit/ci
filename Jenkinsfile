@@ -57,11 +57,10 @@ agent{
   }
 
     stage('sonaranalysis')
-
-     tools{
+    {
+       tools{
       jdk 'jdk17'
        }
-    {
      steps{
       
       withSonarQubeEnv('sonar') {
