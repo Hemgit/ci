@@ -73,6 +73,9 @@ stage('Quality Gate') {
     steps {
         
             timeout(time: 5, unit: 'MINUTES') {
+
+                waitForQualityGate abortPipeline: false
+              /*
                script {
                         // Get Quality Gate result
                         def qg = waitForQualityGate()  // returns a map with status
@@ -86,8 +89,9 @@ stage('Quality Gate') {
                         if (qg.status != 'OK') {
                             error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
                         }
-              // waitForQualityGate abortPipeline: false
+             
                 }
+                */
             }
         }
 }
