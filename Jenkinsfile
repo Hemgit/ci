@@ -59,6 +59,9 @@ agent{
     stage('sonaranalysis')
     {
      steps{
+       tools{
+      jdk 'jdk17'
+       }
       withSonarQubeEnv('sonar') {
         sh 'mvn sonar:sonar -Dsonar.projectKey=Maven-Java-Project'
     // some block
