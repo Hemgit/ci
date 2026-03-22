@@ -80,6 +80,17 @@ agent{
         }
      }
     }
+
+   stage('qualitygate'){
+     steps{
+
+ timeout(time: 10, unit: 'minutes')  {
+   waitForQualityGate abortPipeline: false, credentialsId: 'sonarkey'
+}
+     
+     }
+   }
+    
   }
   
 }
