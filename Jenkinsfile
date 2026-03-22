@@ -79,19 +79,21 @@ agent{
             mail bcc: '', body: 'sonar code analysis failed', cc: '', from: '', replyTo: '', subject: 'sonar code analysis  failed', to: '5hemanthunplugged@gmail.com'
         }
      }
+
+    }
+
+    stage('qualitygate')
+    {
+     steps{
+      timeout(time: 10, unit: 'MINUTES') {
+        waitForQualityGate abortPipeline: false, credentialsId: 'sonarkey'
+    
+}
+     }
+    }
+    
     
 
-   stage('qualitygate'){
-     steps{
-     
-     timeout (time: 10, unit: 'minutes')  {
-   waitForQualityGate abortPipeline: false, credentialsId: 'sonarkey'
-}
-     
-     
-   }
-    
-  }
   }
   }
 
