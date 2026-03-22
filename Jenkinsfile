@@ -67,6 +67,10 @@ agent{
         sh 'mvn sonar:sonar -Dsonar.projectKey=Maven-Java-Project'
     // some block
 }
+      
+         
+       }
+
        post{
       success {
        sh 'echo sonar success'
@@ -74,8 +78,6 @@ agent{
         failure{
             mail bcc: '', body: 'sonar code analysis failed', cc: '', from: '', replyTo: '', subject: 'sonar code analysis  failed', to: '5hemanthunplugged@gmail.com'
         }
-         
-       }
      }
     }
   }
