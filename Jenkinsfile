@@ -73,7 +73,20 @@ stage('Quality Gate') {
     steps {
         
             timeout(time: 5, unit: 'MINUTES') {
-               waitForQualityGate abortPipeline: false
+               script {
+                        // Get Quality Gate result
+                        def qg = waitForQualityGate()  // returns a map with status
+                        echo "SonarQube Quality Gate Status: ${qg.status}"
+
+                        // Archive Quality Gate result as JSON
+                        writeFile file: 'quality-gate.json', text: groovy.json.JsonOutput.toJson(qg)
+                        archiveArtifacts artifacts: 'quality-gate.json', allowEmptyArchive: true
+
+                        // Fail pipeline if Quality Gate failed
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
+                        }
+              # waitForQualityGate abortPipeline: false
                 }
             }
         }
@@ -81,7 +94,7 @@ stage('Quality Gate') {
 
     stage('artifact upload') {
      steps{
-      sh 'mvn deploy'
+      sh 'mvn deploy -DskipTests'
      }
       post{
      success {
