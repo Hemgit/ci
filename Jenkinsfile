@@ -71,14 +71,13 @@ agent{
 
 stage('Quality Gate') {
     steps {
-        script {
+        
             timeout(time: 5, unit: 'MINUTES') {
                waitForQualityGate abortPipeline: false
                 }
             }
         }
-    }
-}
+    
   }
   }
 
