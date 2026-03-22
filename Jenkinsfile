@@ -83,6 +83,7 @@ agent{
     }
 
   stage("Quality Gate"){
+    steps{
           timeout(time: 10, unit: 'MINUTES') {
               def qg = waitForQualityGate()
               if (qg.status != 'OK') {
@@ -90,7 +91,7 @@ agent{
               }
           }
       } 
-
+  }
   }
   }
 
