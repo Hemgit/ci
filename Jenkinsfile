@@ -85,7 +85,15 @@ agent{
     stage('qualitygate')
     {
      steps{
-      timeout(time: 10, unit: 'MINUTES') {
+      timeout(time: 10, unit: 'SECONDS') {
+
+        script {
+    def qg = waitForQualityGate()
+    echo "Quality Gate status: ${qg.status}"
+            if (qg.status != 'OK') {
+                    error "Pipeline aborted because Quality Gate failed: ${qg.status}"
+}
+        }
         waitForQualityGate abortPipeline: false, credentialsId: 'sonarkey'
     
 }
