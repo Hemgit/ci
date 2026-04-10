@@ -30,22 +30,9 @@ sh 'echo $HOME'
     }
 
     
-    stage('Test'){
-     steps{
-      sh 'mvn test'
-     }
-      post{
-       success{
-         junit 'target/surefire-reports/*.xml'
-       }
-        failure{
-        mail bcc: '', body: 'unit test failed', cc: '', from: '', replyTo: '', subject: 'unit test failed', to: '5hemanthunplugged@gmail.com'
-        }
-      }
-    }
    stage('integration testing'){
      steps{
-      sh 'mvn verify -DskipUnitTests'
+      sh 'mvn verify '
      }
      post{
         success{
@@ -114,8 +101,8 @@ stage('Quality Gate') {
         withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
             sh '''
             export KUBECONFIG=$kubeconfig
-               kubectl apply -f k8s-code/stage/namespace/
-               kubectl apply -f k8s-code/stage/app/
+               kubectl apply -f k8s-code/staging/namespace/
+               kubectl apply -f k8s-code/staging/app/
             '''
         }
     }
