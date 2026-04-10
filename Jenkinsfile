@@ -43,7 +43,7 @@ agent{
     }
    stage('integration testing'){
      steps{
-      sh 'mvn verify -DskipTests'
+      sh 'mvn verify -DskipUnitTests'
      }
      post{
         success{
