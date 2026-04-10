@@ -60,7 +60,9 @@ pipeline {
                         sh 'mvn verify -DskipUnitTests'
                     }
                     post {
-                        success { junit 'target/failsafe-reports/*.xml' }
+                        success { 
+junit 'target/surefire-reports/*.xml'
+junit 'target/failsafe-reports/*.xml' }
                     }
                 }
             }
@@ -107,7 +109,7 @@ pipeline {
                         kubectl apply -f k8s-code/staging/namespace/
                         
                         # Update the image dynamically in the manifest
-                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" k8s-code/staging/app/*.yaml
+                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" target/k8s-code/staging/app/*.yml
                         kubectl apply -f k8s-code/staging/app/
                     '''
                 }
@@ -126,7 +128,7 @@ pipeline {
                         export KUBECONFIG=${KUBE_PATH}
                         kubectl apply -f k8s-code/prod/namespace/
                         
-                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" k8s-code/prod/app/*.yaml
+                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" k8s-code/prod/app/*.yml
                         kubectl apply -f k8s-code/prod/app/
                     '''
                 }
