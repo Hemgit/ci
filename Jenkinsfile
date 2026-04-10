@@ -113,7 +113,8 @@ stage('Quality Gate') {
     steps {
         withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
             sh '''
-               kubectl apply -f k8s-code/prod/namespace
+            export KUBECONFIG=$kubeconfig
+               kubectl apply -f k8s-code/prod/namespace/
             '''
         }
     }
