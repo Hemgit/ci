@@ -115,6 +115,7 @@ stage('Quality Gate') {
             sh '''
             export KUBECONFIG=$kubeconfig
                kubectl apply -f k8s-code/prod/namespace/
+               kubectl apply -f k8s-code/prod/app/
             '''
         }
     }
