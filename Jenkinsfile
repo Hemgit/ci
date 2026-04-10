@@ -99,6 +99,13 @@ stage('Quality Gate') {
         sh 'ls -ltr && pwd'
         sh 'mv target/*.war student.war'
         sh 'docker build -t testimage:v1 .' 
+        sh 'docker tag testimage:v1 hemgit/testimage:v1'
+ withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'password', usernameVariable: 'username')]) {
+  sh 'docker login -u $username -p $password'
+   sh 'docker push hemgit/testimage:v1'
+   
+}
+        
       }
     }
     
