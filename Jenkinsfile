@@ -108,6 +108,13 @@ stage('Quality Gate') {
         
       }
     }
+
+    stage('deploy to kops'){
+      steps{
+
+      }
+
+    }
     
   }
   }
