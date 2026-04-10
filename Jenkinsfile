@@ -99,7 +99,7 @@ stage('Quality Gate') {
 
     stage('artifact upload') {
      steps{
-      sh 'mvn deploy -DskipTests'
+      sh 'mvn deploy -DskipTests --settings /home/devops/.m2/settings.xml'
      }
       post{
      success {
