@@ -109,7 +109,28 @@ stage('Quality Gate') {
       }
     }
 
-   stage('deploy to kops') {
+     stage('deploy to stage ') {
+    steps {
+        withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
+            sh '''
+            export KUBECONFIG=$kubeconfig
+               kubectl apply -f k8s-code/stage/namespace/
+               kubectl apply -f k8s-code/stage/app/
+            '''
+        }
+    }
+}
+
+    stage('approval'){
+      steps{
+      echo "Approval State"
+    timeout(time: 7, unit: 'DAYS') {
+    input message: 'Do you want to deploy?', submitter: 'admin'
+}
+    }
+    }
+
+   stage('deploy to prod ') {
     steps {
         withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
             sh '''
