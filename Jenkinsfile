@@ -97,6 +97,7 @@ stage('Quality Gate') {
     stage('imagebuild'){
       steps{
         sh 'docker build -t testimage:v1'
+      }
     
   }
   }
