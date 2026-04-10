@@ -109,7 +109,7 @@ junit 'target/failsafe-reports/*.xml' }
                         kubectl apply -f k8s-code/staging/namespace/
                         
                         # Update the image dynamically in the manifest
-                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" target/k8s-code/staging/app/*.yml
+                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" k8s-code/staging/app/*.yml
                         kubectl apply -f k8s-code/staging/app/
                     '''
                 }
