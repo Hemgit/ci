@@ -11,6 +11,8 @@ agent{
     {
       steps{
         git credentialsId: 'github', url: 'https://github.com/Hemgit/Maven-Java-Project.git'
+        sh 'whoami'
+sh 'echo $HOME'
       }
     }
     stage('build'){
