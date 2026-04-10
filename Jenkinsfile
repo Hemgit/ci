@@ -88,7 +88,7 @@ stage('Quality Gate') {
         sh 'docker build -t testimage:v1 .' 
         sh 'docker tag testimage:v1 hemgit/testimage:v1'
  withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'password', usernameVariable: 'username')]) {
-  sh 'docker login -u $username -p $password'
+ sh 'echo $password | docker login -u $username --password-stdin'
    sh 'docker push hemgit/testimage:v1'
    
 }
