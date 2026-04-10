@@ -109,18 +109,23 @@ stage('Quality Gate') {
       }
     }
 
-    stage('deploy to kops'){
-      steps{
-      withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
-        sh 'echo "KUBECONFIG=$kubeconfig"'
- sh 'kubectl config view'
-sh 'kubectl cluster-info'
-    // some block
-}
-
-      }
-
+   stage('deploy to kops') {
+    steps {
+        withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
+            sh '''
+                # 1. Map your Jenkins variable to the ENV variable kubectl expects
+                export KUBECONFIG=$kubeconfig
+                
+                # 2. Verify it's reading the RNSTech server
+                echo "Using configuration for: euwest.dev.rnstech.com"
+                kubectl config view
+                
+                # 3. Test the connection
+                kubectl cluster-info
+            '''
+        }
     }
+}
     
   }
   }
