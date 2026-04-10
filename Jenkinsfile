@@ -98,9 +98,9 @@ stage('Quality Gate') {
 
      stage('deploy to stage ') {
     steps {
-        withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
+        withCredentials([file(credentialsId: 'kops', variable: 'KUBECONFIG')]) {
             sh '''
-            export KUBECONFIG=$kubeconfig
+            //export KUBECONFIG=$kubeconfig
                kubectl apply -f k8s-code/staging/namespace/
                kubectl apply -f k8s-code/staging/app/
             '''
@@ -119,9 +119,9 @@ stage('Quality Gate') {
 
    stage('deploy to prod ') {
     steps {
-        withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
+        withCredentials([file(credentialsId: 'kops', variable: 'KUBECONFIG')]) {
             sh '''
-            export KUBECONFIG=$kubeconfig
+            //export KUBECONFIG=$kubeconfig
                kubectl apply -f k8s-code/prod/namespace/
                kubectl apply -f k8s-code/prod/app/
             '''
