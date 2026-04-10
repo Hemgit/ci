@@ -1,0 +1,149 @@
+pipeline {
+    agent { label 'buildserver' }
+
+    environment {
+        // Centralized configuration
+        DOCKER_REPO = "hemgit/testimage"
+        IMAGE_TAG   = "v${BUILD_NUMBER}"
+        APP_NAME    = "student-app"
+        SONAR_KEY   = "Maven-Java-Project"
+    }
+
+    tools {
+        jdk 'jdk8'
+        maven 'm3'
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    echo "Starting Build #${BUILD_NUMBER}"
+                    currentBuild.displayName = "#${BUILD_NUMBER}-${env.BRANCH_NAME ?: 'manual'}"
+                }
+                sh 'mvn --version'
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                git credentialsId: 'github', 
+                    url: 'https://github.com/Hemgit/Maven-Java-Project.git'
+            }
+        }
+
+        stage('Build & Unit Test') {
+            steps {
+                // Combine build and test for efficiency
+                sh 'mvn clean install' 
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'target/*.war', fingerprint: true
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Quality Analysis') {
+            parallel { // Run Analysis and Integration tests in parallel to save time
+                stage('SonarQube') {
+                    tools { jdk 'jdk17' }
+                    steps {
+                        withSonarQubeEnv('sonar') {
+                            sh "mvn sonar:sonar -Dsonar.projectKey=${SONAR_KEY}"
+                        }
+                    }
+                }
+                stage('Integration Test') {
+                    steps {
+                        sh 'mvn verify -DskipUnitTests'
+                    }
+                    post {
+                        success { junit 'target/failsafe-reports/*.xml' }
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true // Senior approach: Fail if quality is bad
+                }
+            }
+        }
+
+        stage('Artifact Push') {
+            steps {
+                sh 'mvn deploy -DskipTests'
+            }
+        }
+
+        stage('Containerize') {
+            steps {
+                script {
+                    sh "cp target/*.war student.war"
+                    sh "docker build -t ${DOCKER_REPO}:${IMAGE_TAG} ."
+                    
+                    withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
+                        sh "docker push ${DOCKER_REPO}:${IMAGE_TAG}"
+                        sh "docker tag ${DOCKER_REPO}:${IMAGE_TAG} ${DOCKER_REPO}:latest"
+                        sh "docker push ${DOCKER_REPO}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Staging') {
+            steps {
+                withCredentials([file(credentialsId: 'kops', variable: 'KUBE_PATH')]) {
+                    sh '''
+                        export KUBECONFIG=${KUBE_PATH}
+                        # Use set-context to ensure we are in the right cluster from the file 
+                        kubectl config use-context euwest.dev.rnstech.com 
+                        
+                        kubectl apply -f k8s-code/staging/namespace/
+                        
+                        # Update the image dynamically in the manifest
+                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" k8s-code/staging/app/*.yaml
+                        kubectl apply -f k8s-code/staging/app/
+                    '''
+                }
+            }
+        }
+
+        stage('Promote to Production') {
+            input {
+                message "Promote Build #${BUILD_NUMBER} to Production?"
+                ok "Deploy Now"
+                submitter "admin"
+            }
+            steps {
+                withCredentials([file(credentialsId: 'kops', variable: 'KUBE_PATH')]) {
+                    sh '''
+                        export KUBECONFIG=${KUBE_PATH}
+                        kubectl apply -f k8s-code/prod/namespace/
+                        
+                        sed -i "s|image:.*|image: ${DOCKER_REPO}:${IMAGE_TAG}|g" k8s-code/prod/app/*.yaml
+                        kubectl apply -f k8s-code/prod/app/
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Housekeeping: Clean workspace and local docker images
+            cleanWs()
+            sh "docker rmi ${DOCKER_REPO}:${IMAGE_TAG} || true"
+        }
+        failure {
+            mail to: '5hemanthunplugged@gmail.com',
+                 subject: "Pipeline Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                 body: "Check build logs at: ${env.BUILD_URL}"
+        }
+    }
+}
