@@ -96,6 +96,7 @@ stage('Quality Gate') {
 
     stage('imagebuild'){
       steps{
+        sh 'mv *.war student.war'
         sh 'docker build -t testimage:v1 .' 
       }
     }
