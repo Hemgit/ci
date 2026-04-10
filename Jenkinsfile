@@ -112,9 +112,9 @@ stage('Quality Gate') {
     stage('deploy to kops'){
       steps{
       withCredentials([file(credentialsId: 'kops', variable: 'kubeconfig')]) {
-        echo "KUBECONFIG=$KUBECONFIG"
-kubectl config view
-kubectl cluster-info
+        sh 'echo "KUBECONFIG=$KUBECONFIG"'
+ sh 'kubectl config view'
+sh 'kubectl cluster-info'
     // some block
 }
 
